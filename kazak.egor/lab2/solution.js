@@ -1,70 +1,19 @@
 export function calculateExpression(expr) {
-  if (typeof expr !== 'string' || expr.trim() === '') {
-    throw new Error('Введите непустое выражение.');
-  }
-
-  let position = 0;
-
-  function skipSpaces() {
-    while (position < expr.length && /\s/.test(expr[position])) {
-      position++;
-    }
-  }
-
-  function readNumber() {
-    skipSpaces();
-    let sign = 1;
-    if (expr[position] === '+' || expr[position] === '-') {
-      sign = expr[position] === '-' ? -1 : 1;
-      position++;
-      skipSpaces();
-    }
-
-    const match = expr.slice(position).match(/^(\d+(\.\d+)?|\.\d+)/);
-    if (!match) {
-      throw new Error(`Ожидалось число в позиции ${position + 1}.`);
-    }
-    position += match[0].length;
-    const number = sign * Number(match[0]);
-    if (!Number.isFinite(number)) {
-      throw new Error('Слишком большое число.');
-    }
-    return number;
-  }
-
   let result = 0;
-  let term = readNumber();
-  skipSpaces();
 
-  // Сначала считаем произведения и частные, затем складываем слагаемые.
-  while (position < expr.length) {
-    const operator = expr[position];
-    if (!'+-*/'.includes(operator)) {
-      throw new Error(`Неизвестный оператор в позиции ${position + 1}.`);
-    }
-    position++;
-    const number = readNumber();
+  // Разделяем выражение на слагаемые.
+  const terms = expr.split('+');
+  for (const term of terms) {
+    let product = 1;
+    const factors = term.split('*');
 
-    if (operator === '*') {
-      term *= number;
-    } else if (operator === '/') {
-      if (number === 0) {
-        throw new Error('Деление на ноль запрещено.');
-      }
-      term /= number;
-    } else {
-      result += term;
-      term = operator === '+' ? number : -number;
+    // Внутри каждого слагаемого сначала выполняем умножение.
+    for (const factor of factors) {
+      product *= Number(factor);
     }
-    if (!Number.isFinite(term) || !Number.isFinite(result)) {
-      throw new Error('Результат выходит за допустимый диапазон чисел.');
-    }
-    skipSpaces();
+
+    result += product;
   }
 
-  result += term;
-  if (!Number.isFinite(result)) {
-    throw new Error('Результат выходит за допустимый диапазон чисел.');
-  }
   return result;
 }
