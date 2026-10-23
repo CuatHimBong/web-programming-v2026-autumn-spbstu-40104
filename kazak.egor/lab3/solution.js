@@ -6,7 +6,6 @@ export function findMostFrequent(arr) {
 
   let mostFrequent;
   let maxCount = 0;
-  // Map сохраняет порядок появления элементов, поэтому при равенстве останется первый.
   for (const [item, count] of counts) {
     if (count > maxCount) {
       maxCount = count;
